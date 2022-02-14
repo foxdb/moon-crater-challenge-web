@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/moon-crater-challenge-web/static/css/main.fb894872.css",
+    "main.js": "/moon-crater-challenge-web/static/js/main.9529b1ef.js",
+    "static/js/787.e6e81f13.chunk.js": "/moon-crater-challenge-web/static/js/787.e6e81f13.chunk.js",
+    "static/media/moon.png": "/moon-crater-challenge-web/static/media/moon.fa548f460b2c71cbd186.png",
+    "index.html": "/moon-crater-challenge-web/index.html",
+    "main.fb894872.css.map": "/moon-crater-challenge-web/static/css/main.fb894872.css.map",
+    "main.9529b1ef.js.map": "/moon-crater-challenge-web/static/js/main.9529b1ef.js.map",
+    "787.e6e81f13.chunk.js.map": "/moon-crater-challenge-web/static/js/787.e6e81f13.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.fb894872.css",
+    "static/js/main.9529b1ef.js"
+  ]
+}
