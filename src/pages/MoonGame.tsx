@@ -1,21 +1,23 @@
-import React from 'react';
-import moon from '../moon.png';
-import ReactCursorPosition from '@imizaac/react-cursor-position';
-import PositionTracker from '../components/PositionTracker';
-import { getRandomAnswer, isAnswerCorrect, TOLERANCE_PX } from '../game';
-import { say } from '../lib/speechSynthesis';
-const debounce = require('debounce');
+import React from "react";
+import moon from "../moon.png";
+import ReactCursorPosition from "@imizaac/react-cursor-position";
+import PositionTracker from "../components/PositionTracker";
+import { getRandomAnswer, isAnswerCorrect, TOLERANCE_PX } from "../game";
+import { say } from "../lib/speechSynthesis";
+import "./MoonGame.css";
+const debounce = require("debounce");
 
 export default function MoonGame() {
-  // AWAITING_GUESS, WON, LOST
-  const [gameState, setGameState] = React.useState<string>('AWAITING_GUESS');
+  // INIT, AWAITING_GUESS, WON, LOST
+  const [gameState, setGameState] = React.useState<string>("INIT");
   const [cursorWPx, setCursorWPx] = React.useState<number>(0);
   const [cursorHPx, setCursorHPx] = React.useState<number>(0);
   const [guessWPx, setGuessWPx] = React.useState<number>(0);
   const [guessHPx, setGuessHPx] = React.useState<number>(0);
   const [answerWPx, setAnswerWPx] = React.useState<number>(0);
   const [answerHPx, setAnswerHPx] = React.useState<number>(0);
-  const [craterName, setCraterName] = React.useState<string>('');
+  const [craterName, setCraterName] = React.useState<string>("");
+  const [debug, setDebug] = React.useState<boolean>(true);
 
   const [showGuessRectangle, setShowGuessRectangle] =
     React.useState<boolean>(false);
@@ -35,21 +37,27 @@ export default function MoonGame() {
     setCraterName(newCrater.name);
     say(`Trouver le cratère : ${newCrater.name}`);
   };
-
-  React.useEffect(() => {
+  const onStartGame = () => {
+    setGameState("AWAITING_GUESS");
     onReset();
-  }, []);
+  };
+
+  // React.useEffect(() => {
+  //   onReset();
+  // }, []);
 
   const onSubmitTracking = () => {
     setGuessHPx(cursorHPx);
     setGuessWPx(cursorWPx);
 
     if (isAnswerCorrect(cursorHPx, cursorWPx, answerHPx, answerWPx)) {
+      console.log("WON");
       say("C'est gagné!");
-      setGameState('WON');
+      setGameState("WON");
     } else {
+      console.log("LOST");
       say("C'est perdu!");
-      setGameState('LOST');
+      setGameState("LOST");
     }
 
     setShowAnswerRectangle(true);
@@ -88,30 +96,44 @@ export default function MoonGame() {
     50
   );
 
-  const answerRectangleColor = gameState === 'WON' ? 'green' : 'red';
+  const answerRectangleColor = gameState === "WON" ? "green" : "red";
 
   return (
     <>
-      <div style={{ color: 'red' }}>
-        <span>x: {cursorWPx}</span>
-        <span>y: {cursorHPx}</span>
-        <span>
-          <button type="button" onClick={onReset}>
-            reset
-          </button>
-        </span>
-        <p>show me: {craterName}</p>
+      <div className="game-controls-container">
+        {gameState === "INIT" && (
+          <span>
+            <button type="button" onClick={onStartGame}>
+              start
+            </button>
+          </span>
+        )}
+        {gameState !== "INIT" && debug && (
+          <>
+            <span>
+              DEBUG mode: After click, answer is yellow, guess is red when
+              wrong, green when correct. Hit "reset" to get a new crater to
+              guess. Turn the volume up, speech synthesis works.
+            </span>
+            <p>show me: {craterName}</p>
+            <span>
+              <button type="button" onClick={onReset}>
+                reset
+              </button>
+            </span>
+          </>
+        )}
       </div>
       <div
         style={{
           // textAlign: 'center',
-          position: 'relative',
+          position: "relative",
           // marginBottom: 20,
           marginTop: 10,
           marginLeft: 50,
           // display: 'inline-block',
           // width: '90%',
-          backgroundColor: 'blue',
+          backgroundColor: "blue",
         }}
       >
         {showGuessRectangle && (
@@ -121,7 +143,7 @@ export default function MoonGame() {
               width: TOLERANCE_PX,
               // backgroundColor: 'salmon',
               border: `3px solid ${answerRectangleColor}`,
-              position: 'absolute',
+              position: "absolute",
               zIndex: 99,
               top: `${Math.max(guessHPx - Math.floor(TOLERANCE_PX / 2), 0)}px`,
               left: `${Math.max(guessWPx - Math.floor(TOLERANCE_PX / 2), 0)}px`,
@@ -134,8 +156,8 @@ export default function MoonGame() {
               height: TOLERANCE_PX,
               width: TOLERANCE_PX,
               // backgroundColor: 'salmon',
-              border: '3px solid yellow',
-              position: 'absolute',
+              border: "3px solid yellow",
+              position: "absolute",
               zIndex: 98,
               top: `${Math.max(answerHPx - Math.floor(TOLERANCE_PX / 2), 0)}px`,
               left: `${Math.max(
@@ -145,7 +167,7 @@ export default function MoonGame() {
             }}
           ></div>
         )}
-        <div style={{ position: 'absolute' }}>
+        <div style={{ position: "absolute" }}>
           <ReactCursorPosition>
             <PositionTracker
               submit={onSubmitTracking}
@@ -154,6 +176,13 @@ export default function MoonGame() {
               setCursorPosition={setCursorPosition}
             />
           </ReactCursorPosition>
+          {debug && (
+            <div>
+              {"DEBUG"}
+              <span>x: {cursorWPx}</span>
+              <span>y: {cursorHPx}</span>
+            </div>
+          )}
         </div>
       </div>
     </>

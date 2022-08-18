@@ -1,6 +1,6 @@
-import React from 'react';
-import './App.css';
-import MoonGame from './pages/MoonGame';
+import React from "react";
+import "./App.css";
+import MoonGame from "./pages/MoonGame";
 
 // import Swal from 'sweetalert2'
 
