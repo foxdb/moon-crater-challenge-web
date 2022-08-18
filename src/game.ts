@@ -2,18 +2,7 @@
 
 const MOON_IMG_WIDTH_PX = 849;
 const MOON_IMG_HEIGHT_PX = 849;
-
-// validate that the clicked answer is in the picture
-const isAnswerValid = (answerXPx: number, answerYPx: number): boolean => {
-  return (
-    answerXPx <= MOON_IMG_WIDTH_PX &&
-    answerXPx >= 0 &&
-    answerYPx <= MOON_IMG_HEIGHT_PX &&
-    answerYPx >= 0
-  );
-};
-
-// hardcoding a test case
+const TOLERANCE_PX = 50;
 
 interface Crater {
   name: string;
@@ -43,4 +32,32 @@ const getRandomAnswer = (): Crater => {
   return craters[Math.floor(Math.random() * craters.length)];
 };
 
-export { isAnswerValid, getRandomAnswer };
+// validate that the clicked answer is in the picture
+const isAnswerValid = (answerXPx: number, answerYPx: number): boolean => {
+  return (
+    answerXPx <= MOON_IMG_WIDTH_PX &&
+    answerXPx >= 0 &&
+    answerYPx <= MOON_IMG_HEIGHT_PX &&
+    answerYPx >= 0
+  );
+};
+
+const _isAnswerCorrect =
+  (tolerance: number) =>
+  (guessH: number, guessW: number, answerH: number, answerW: number) => {
+    const tol = Math.ceil(tolerance / 2);
+    if (
+      answerH - tol < guessH &&
+      guessH < answerH + tol &&
+      answerW - tol < guessW &&
+      guessW < answerW + tol
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+const isAnswerCorrect = _isAnswerCorrect(TOLERANCE_PX);
+
+export { isAnswerCorrect, getRandomAnswer, TOLERANCE_PX };

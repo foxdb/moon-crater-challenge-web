@@ -2,10 +2,13 @@ import React from 'react';
 import moon from '../moon.png';
 import ReactCursorPosition from '@imizaac/react-cursor-position';
 import PositionTracker from '../components/PositionTracker';
-import { getRandomAnswer } from '../game';
+import { getRandomAnswer, isAnswerCorrect, TOLERANCE_PX } from '../game';
+import { say } from '../lib/speechSynthesis';
 const debounce = require('debounce');
 
 export default function MoonGame() {
+  // AWAITING_GUESS, WON, LOST
+  const [gameState, setGameState] = React.useState<string>('AWAITING_GUESS');
   const [cursorWPx, setCursorWPx] = React.useState<number>(0);
   const [cursorHPx, setCursorHPx] = React.useState<number>(0);
   const [guessWPx, setGuessWPx] = React.useState<number>(0);
@@ -30,27 +33,28 @@ export default function MoonGame() {
     setAnswerHPx(newCrater.hPx);
     setAnswerWPx(newCrater.wPx);
     setCraterName(newCrater.name);
+    say(`Trouver le cratère : ${newCrater.name}`);
   };
-
-  // onReset();
 
   React.useEffect(() => {
     onReset();
   }, []);
 
   const onSubmitTracking = () => {
-    console.log('onSubmitTracking');
-
     setGuessHPx(cursorHPx);
     setGuessWPx(cursorWPx);
+
+    if (isAnswerCorrect(cursorHPx, cursorWPx, answerHPx, answerWPx)) {
+      say("C'est gagné!");
+      setGameState('WON');
+    } else {
+      say("C'est perdu!");
+      setGameState('LOST');
+    }
 
     setShowAnswerRectangle(true);
     setShowGuessRectangle(true);
   };
-
-  // const getSquareCoordinatesInPercents = () => {
-
-  // }
 
   const setCursorPosition = debounce(
     ({
@@ -84,6 +88,8 @@ export default function MoonGame() {
     50
   );
 
+  const answerRectangleColor = gameState === 'WON' ? 'green' : 'red';
+
   return (
     <>
       <div style={{ color: 'red' }}>
@@ -111,28 +117,31 @@ export default function MoonGame() {
         {showGuessRectangle && (
           <div
             style={{
-              height: 30,
-              width: 30,
+              height: TOLERANCE_PX,
+              width: TOLERANCE_PX,
               // backgroundColor: 'salmon',
-              border: '2px solid red',
+              border: `3px solid ${answerRectangleColor}`,
               position: 'absolute',
-              zIndex: 98,
-              top: `${Math.max(guessHPx - 15, 0)}px`,
-              left: `${Math.max(guessWPx - 15, 0)}px`,
+              zIndex: 99,
+              top: `${Math.max(guessHPx - Math.floor(TOLERANCE_PX / 2), 0)}px`,
+              left: `${Math.max(guessWPx - Math.floor(TOLERANCE_PX / 2), 0)}px`,
             }}
           ></div>
         )}
         {showAnswerRectangle && (
           <div
             style={{
-              height: 30,
-              width: 30,
+              height: TOLERANCE_PX,
+              width: TOLERANCE_PX,
               // backgroundColor: 'salmon',
-              border: '2px solid yellow',
+              border: '3px solid yellow',
               position: 'absolute',
-              zIndex: 99,
-              top: `${Math.max(answerHPx - 15, 0)}px`,
-              left: `${Math.max(answerWPx - 15, 0)}px`,
+              zIndex: 98,
+              top: `${Math.max(answerHPx - Math.floor(TOLERANCE_PX / 2), 0)}px`,
+              left: `${Math.max(
+                answerWPx - Math.floor(TOLERANCE_PX / 2),
+                0
+              )}px`,
             }}
           ></div>
         )}
